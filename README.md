@@ -44,6 +44,9 @@ cd RAG_APP
 #### **3. Configure the Application**
 Create an `.env` file for application configuration. Use `.env.example` as a reference to populate the required fields and values.
 
+#### **4. Run the docker**
+Check the instruction below.
+
 ---
 
 ### **Running the Application with Docker**
@@ -74,7 +77,7 @@ bash run_docker.sh restart dev
 
 ## User Guide
 
-### How this app work
+### How this app works
 
 #### Upload pdf with your userID (string): UserID can be anyting in text, just use it to call chat history
 
