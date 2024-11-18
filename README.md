@@ -1,5 +1,17 @@
 # RAG_APP
 
+## **Table of Contents**
+
+1. **To Do Next**  
+2. **How to run this app**  
+   - Prerequisites  
+   - Cloning and Setup  
+3. **User Guide**  
+   - How This App Works  
+   - How to Get Chat History  
+   - How to Clear Chat History  
+   - How to Use LangChain QA Eval  
+
 ## To Do Next
 - Improve evaluation on doc extraction
 - PDF Extraction Speed
@@ -10,8 +22,61 @@
 - Add Logs
 - Add more content type
 
-## How this work
-# Upload pdf with your userID (string): UserID can be anyting in text, just use it to call chat history
+## How to run this app
+
+### Prerequisites
+- **Docker**: Ensure Docker is installed on your system. Refer to [Docker's official installation guide](https://docs.docker.com/get-docker/).
+
+### Cloning and Setup
+
+#### **1. Clone the Repository**
+Clone the repository to your local machine:
+```bash
+git clone https://github.com/minkhant1996/RAG_APP.git
+```
+
+#### **2. Navigate to the Project Directory**
+Move into the cloned directory:
+```bash
+cd RAG_APP
+```
+
+#### **3. Configure the Application**
+Create an `.env` file for application configuration. Use `.env.example` as a reference to populate the required fields and values.
+
+---
+
+### **Running the Application with Docker**
+
+#### **Build the Application**
+To build the application in the development environment:
+```bash
+bash run_docker.sh build dev
+```
+
+#### **Run the Application**
+To start the application:
+```bash
+bash run_docker.sh up dev
+```
+
+#### **Stop the Application**
+To stop the running application:
+```bash
+bash run_docker.sh down dev
+```
+
+#### **Restart the Application**
+To restart the application:
+```bash
+bash run_docker.sh restart dev
+```
+
+## User Guide
+
+### How this app work
+
+#### Upload pdf with your userID (string): UserID can be anyting in text, just use it to call chat history
 
 Example API call
 
@@ -32,7 +97,7 @@ Example Response
 }
 ```
 
-# Then you can start chatting with your pdf
+#### Then you can start chatting with your pdf
 
 Example API call
 
@@ -89,6 +154,24 @@ Example Response
   ]
 }
 ```
+
+## How to clear chat history
+
+Example API call
+
+```bash
+curl -X 'GET' \
+  'http://localhost:8000/api/v1/clear_conversation?userId=u123456' \
+  -H 'accept: application/json'
+```
+
+Example Response:
+```bash
+{
+  "message": "Conversation cleared successfully."
+}
+```
+
 ## How to use lanchain QA eval
 
 Example API call

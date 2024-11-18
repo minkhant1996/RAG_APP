@@ -102,6 +102,11 @@
     #     f.write(extracted_knowledge)
 
 
+# Command to run in terminal if tessdata error occur
+# echo $TESSDATA_PREFIX
+# ls $TESSDATA_PREFIX
+# find / -name "eng.traineddata"
+
 from pytesseract import image_to_string
 from PIL import Image
 
