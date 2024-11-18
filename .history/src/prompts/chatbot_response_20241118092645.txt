@@ -1,9 +1,0 @@
-<Research>
-<system_prompt>
-
-<system_prompt>
-
-<input_prompt>
-
-<input_prompt>
-<Research>
