@@ -1,0 +1,16 @@
+pymupdf
+pillow
+pytesseract
+langchain
+langchain-community
+langchain_experimental
+langchain_openai
+transformers
+unstructured
+unstructured-inference
+unstructured_pytesseract
+python-dotenv
+faiss-cpu
+redis
+pi_heif
+

@@ -1,0 +1,26 @@
+version: '3.9'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: dockers/Dockerfile.dev
+    container_name: rag-service-min
+    image: rag-service-min.dev
+    environment:
+      - ENV=development
+      - REDIS_HOST=redis
+      - REDIS_PORT=6380
+    depends_on:
+      - redis
+    ports:
+      - "8000:8000" 
+    env_file:
+      - .env
+
+  redis:
+    image: redis:latest
+    container_name: rag-redis-min
+    command: ["redis-server", "--port", "6380"]  
+    ports:
+      - "6380:6380"
