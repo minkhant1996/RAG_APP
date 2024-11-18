@@ -1,5 +1,7 @@
 # RAG_APP
 
+---
+
 ## Table of Contents
 - [To Do Next](#to-do-next)
 - [How to Run This App](#how-to-run-this-app)
@@ -11,6 +13,7 @@
     - [How to Clear Chat History](#how-to-clear-chat-history)
     - [How to Use LangChain QA Eval](#how-to-use-langchain-qa-eval)
 
+---
 
 ## To Do Next
 - Improve evaluation on doc extraction
@@ -21,6 +24,8 @@
 - Add New Doc to FAISS (Current Version: It will replace if new pdf is uploaded)
 - Add Logs
 - Add more content type
+
+---
 
 ## How to run this app
 
@@ -45,7 +50,8 @@ cd RAG_APP
 Create an `.env` file for application configuration. Use `.env.example` as a reference to populate the required fields and values.
 
 #### **4. Run the docker**
-Check the instruction below.
+- Modify the volume in docker-compose.dev.yml as your local path
+- To run the docker-compose, check the instruction below.
 
 ---
 
@@ -74,6 +80,8 @@ To restart the application:
 ```bash
 bash run_docker.sh restart dev
 ```
+
+---
 
 ## User Guide
 
@@ -242,3 +250,5 @@ Example Response
   ]
 }
 ```
+
+---

@@ -79,65 +79,77 @@ async def upload_pdf(
 
 @router.post(config.api_config.chatbot)
 async def chatbot_endpoint(request: chatbot_api):
-    # Simulate chatbot response logic
-    userId = request.userId
-    
-    redis_key = f"{config.redis_config.key.prefix}{userId}{config.redis_config.key.sufix}"
-    user_data = RedisDB_Manager.load_from_redis(redis_key)
-    if not user_data:
-        user_data = RedisDB_Manager.initialize_user_data(redis_key, userId)
-    
-    
-    user_query = request.user_query.strip()
-    user_data = RedisDB_Manager.add_chat_history(redis_key, user_data, user_query=user_query)
-    
-    if not user_query:
-        raise HTTPException(status_code=400, detail="User_query cannot be empty.")
+    try:
+        userId = request.userId
+        
+        redis_key = f"{config.redis_config.key.prefix}{userId}{config.redis_config.key.sufix}"
+        user_data = RedisDB_Manager.load_from_redis(redis_key)
+        if not user_data:
+            user_data = RedisDB_Manager.initialize_user_data(redis_key, userId)
+        
+        
+        user_query = request.user_query.strip()
+        user_data = RedisDB_Manager.add_chat_history(redis_key, user_data, user_query=user_query)
+        
+        if not user_query:
+            raise HTTPException(status_code=400, detail="User_query cannot be empty.")
 
-    response_text = AI_Agents.chatbot_response(userId, user_query, user_data)
-    user_data = RedisDB_Manager.add_chat_history(redis_key, user_data, response=response_text)
+        response_text = AI_Agents.chatbot_response(userId, user_query, user_data)
+        user_data = RedisDB_Manager.add_chat_history(redis_key, user_data, response=response_text)
 
-    return JSONResponse(content={"response": response_text})
+        return JSONResponse(content={"response": response_text})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
 @router.get(config.api_config.clear_conversation)
 async def clear_conversation(userId: str):
-    redis_key = f"{config.redis_config.key.prefix}{userId}{config.redis_config.key.sufix}"
-    user_data = RedisDB_Manager.load_from_redis(redis_key)
-    if not user_data:
-        user_data = RedisDB_Manager.initialize_user_data(redis_key, userId)
-    
-    
-    user_data = RedisDB_Manager.clear_chat_history(redis_key, user_data)
-    return JSONResponse(content={"message": "Conversation cleared successfully."})
+    try:
+        redis_key = f"{config.redis_config.key.prefix}{userId}{config.redis_config.key.sufix}"
+        user_data = RedisDB_Manager.load_from_redis(redis_key)
+        if not user_data:
+            user_data = RedisDB_Manager.initialize_user_data(redis_key, userId)
+        
+        
+        user_data = RedisDB_Manager.clear_chat_history(redis_key, user_data)
+        return JSONResponse(content={"message": "Conversation cleared successfully."})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
 @router.get(config.api_config.retrieve_conversation)
 async def retrieve_conversation(userId: str):
-    redis_key = f"{config.redis_config.key.prefix}{userId}{config.redis_config.key.sufix}"
-    user_data = RedisDB_Manager.load_from_redis(redis_key)
-    if not user_data:
-        user_data = RedisDB_Manager.initialize_user_data(redis_key, userId)
+    try:
+        redis_key = f"{config.redis_config.key.prefix}{userId}{config.redis_config.key.sufix}"
+        user_data = RedisDB_Manager.load_from_redis(redis_key)
+        if not user_data:
+            user_data = RedisDB_Manager.initialize_user_data(redis_key, userId)
+        
+        chat_history = user_data["chat_history"]
+        return JSONResponse(content={"chat_history": chat_history})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
     
-    chat_history = user_data["chat_history"]
-    return JSONResponse(content={"chat_history": chat_history})
 
 @router.post(config.api_config.run_langchain_eval_qa)
 async def run_langchain_eval_qa(request: langchain_eval_qa_api):
-    userId = request.userId
-    question_list = request.question
-    answer_list = request.ref_answer
-    assert len(question_list) == len(answer_list), "The number of questions and answers must be the same."
-    
-    redis_key = f"{config.redis_config.key.prefix}{userId}{config.redis_config.key.sufix}"
-    user_data = RedisDB_Manager.load_from_redis(redis_key)
-    if not user_data:
-        user_data = RedisDB_Manager.initialize_user_data(redis_key, userId)
-    
-    if not user_data["pdf"]:
-        raise HTTPException(status_code=400, detail="No PDFs uploaded yet.")
-    
-    response = AI_Agents.langchain_eval_qa(question_list, answer_list, user_data)
-    
-    return JSONResponse(content={"response": response})
+    try:
+        userId = request.userId
+        question_list = request.question
+        answer_list = request.ref_answer
+        assert len(question_list) == len(answer_list), "The number of questions and answers must be the same."
+        
+        redis_key = f"{config.redis_config.key.prefix}{userId}{config.redis_config.key.sufix}"
+        user_data = RedisDB_Manager.load_from_redis(redis_key)
+        if not user_data:
+            user_data = RedisDB_Manager.initialize_user_data(redis_key, userId)
+        
+        if not user_data["pdf"]:
+            raise HTTPException(status_code=400, detail="No PDFs uploaded yet.")
+        
+        response = AI_Agents.langchain_eval_qa(question_list, answer_list, user_data)
+        
+        return JSONResponse(content={"response": response})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
 # Include the router
 app.include_router(router, prefix=config.api_config.prefix)

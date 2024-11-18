@@ -1,6 +1,6 @@
-ENVIRONMENT: null
+ENVIRONMENT: null               # null for .env files. If you have .env.dev and .env.prod, then set the environment here
 
-API:
+API:                             # API configuration
   prefix: /api/v1
   upload_pdf: /upload_pdf
   chatbot: /chatbot
@@ -8,29 +8,29 @@ API:
   retrieve_conversation: /retrieve_conversation
   run_langchain_eval_qa: /run_langchain_eval_qa
 
-TIMEZONE: Asia/Bangkok
+TIMEZONE: Asia/Bangkok            # timezone for the system
     
 PROMPT:
-  trigger_words:
+  trigger_words:                  # add more trigger words if required. also implement the logic in the code
     system_prompt: system_prompt
     input_prompt: input_prompt
-  content_types:
+  content_types:                   # add more content types if required. also implement the logic in the code
     - Research
-  prompt_files:
+  prompt_files:                    # add more prompt files if required
     image_summary: prompts/image_summary.txt
     refine_query: prompts/refine_query.txt
     find_titles: prompts/find_titles.txt
     intent_detection: prompts/intent_detection.txt
     chatbot_response: prompts/chatbot_response.txt
-    evaluate_doc_extraction: prompts/evaluate_doc_extraction.txt
+    evaluate_doc_extraction: prompts/evaluate_doc_extraction.txt                  
 
 REDIS:
   key:
-    prefix: MinKhant_
-    sufix: _RAG
+    prefix: MinKhant_               # prefix for the key
+    sufix: _RAG                     # suffix for the key
 
 User_Data_Local:
-  user_data_path: /rag_volume/tmp
+  user_data_path: /rag_volume/tmp   # path to store user data including faiss index, pdfs, etc.
 
 RAG:
   vectors_store_type: faiss

@@ -72,85 +72,94 @@ class PDF_Reader:
             gc.collect()
             
         except Exception as e:
-            raise ValueError(f"Error processing PDF: {e}")
+            raise ValueError(f"Error in processing PDF: {e}")
 
     def process_pdf_elements(self):
-        extracted_info = ""
-        title_list = [pdf_element["text"] for pdf_element in self.pdf_element_dict if pdf_element["type"] == "Title"]
-        # main_title = title_list[0] if title_list else None
-        main_title, other_titles = AI_Agents.find_titles(title_list, self.content_type)
-        extracted_info += "List of Titles: " + ", ".join(title_list) + "\n\n"
-        
-        for ele_idx, pdf_element in enumerate(self.pdf_element_dict):
-            if pdf_element["type"] == "Table":
-                extracted_info += self.html_to_text(pdf_element["metadata"]["text_as_html"]) + "\n"  if self.convert_table_html_to_text else pdf_element["metadata"]["text_as_html"] + "\n"
-
-            elif pdf_element["type"] == "Image":
-                base64_image = pdf_element["metadata"]["image_base64"]
-                figure_name = self.get_figure_name(self.pdf_element_dict[max(0, ele_idx - 2): ele_idx + 3]) # only element get 2 previous and 2 next elements to process figure caption
-                
-                if figure_name:
-                    if self.save_image:
-                        ImageProcessor.save_image_local(
-                                    image_data= base64_image, 
-                                    save_path = f"{config.user_config.user_data_path}/{self.userId}",
-                                    file_name = figure_name,
-                                    extension = "png"
-                                )
-                        
-                    extracted_info +=  f"###IMAGE###{figure_name}###IMAGE###" + "\n" 
-                    
-                    if self.summarize_image:
-                        summarized_text = AI_Agents.summarize_image(base64_image, self.content_type)
-                        extracted_info += f"Summary for {figure_name}: " + summarized_text + "\n"
-                else:
-                    extracted_info += pdf_element["text"] + "\n"
-                
-            elif pdf_element["type"] == "Title":
-                if pdf_element["text"] in other_titles or pdf_element["text"] == main_title:
-                    extracted_info += "\n\n"  + pdf_element["text"] + "\n" 
-                else:
-                    extracted_info += pdf_element["text"] + "\n" # Not real titles, Treat as normal text
-                
-            elif pdf_element["type"] == "Header":
-                pass
+        try:
+            extracted_info = ""
+            title_list = [pdf_element["text"] for pdf_element in self.pdf_element_dict if pdf_element["type"] == "Title"]
+            # main_title = title_list[0] if title_list else None
+            main_title, other_titles = AI_Agents.find_titles(title_list, self.content_type)
+            extracted_info += "List of Titles: " + ", ".join(title_list) + "\n\n"
             
-            else: # for the rest: ListItem, NarrativeText, FigureCaption, UncategorizedText, Etc
-                extracted_info += pdf_element["text"] + "\n"  
-      
-        if self.save_pdf_text:
-            file_path = f"{config.user_config.user_data_path}/{self.userId}"
-            os.makedirs(file_path, exist_ok=True)
-            self.save_pdf_text_local(os.path.join(file_path, f"{self.pdf_filename}.txt"), extracted_info)
+            for ele_idx, pdf_element in enumerate(self.pdf_element_dict):
+                if pdf_element["type"] == "Table":
+                    extracted_info += self.html_to_text(pdf_element["metadata"]["text_as_html"]) + "\n"  if self.convert_table_html_to_text else pdf_element["metadata"]["text_as_html"] + "\n"
+
+                elif pdf_element["type"] == "Image":
+                    base64_image = pdf_element["metadata"]["image_base64"]
+                    figure_name = self.get_figure_name(self.pdf_element_dict[max(0, ele_idx - 2): ele_idx + 3]) # only element get 2 previous and 2 next elements to process figure caption
+                    
+                    if figure_name:
+                        if self.save_image:
+                            ImageProcessor.save_image_local(
+                                        image_data= base64_image, 
+                                        save_path = f"{config.user_config.user_data_path}/{self.userId}",
+                                        file_name = figure_name,
+                                        extension = "png"
+                                    )
+                            
+                        extracted_info +=  f"###IMAGE###{figure_name}###IMAGE###" + "\n" 
+                        
+                        if self.summarize_image:
+                            summarized_text = AI_Agents.summarize_image(base64_image, self.content_type)
+                            extracted_info += f"Summary for {figure_name}: " + summarized_text + "\n"
+                    else:
+                        extracted_info += pdf_element["text"] + "\n"
+                    
+                elif pdf_element["type"] == "Title":
+                    if pdf_element["text"] in other_titles or pdf_element["text"] == main_title:
+                        extracted_info += "\n\n"  + pdf_element["text"] + "\n" 
+                    else:
+                        extracted_info += pdf_element["text"] + "\n" # Not real titles, Treat as normal text
+                    
+                elif pdf_element["type"] == "Header":
+                    pass
+                
+                else: # for the rest: ListItem, NarrativeText, FigureCaption, UncategorizedText, Etc
+                    extracted_info += pdf_element["text"] + "\n"  
         
-        return extracted_info, main_title, other_titles
+            if self.save_pdf_text:
+                file_path = f"{config.user_config.user_data_path}/{self.userId}"
+                os.makedirs(file_path, exist_ok=True)
+                self.save_pdf_text_local(os.path.join(file_path, f"{self.pdf_filename}.txt"), extracted_info)
+            
+            return extracted_info, main_title, other_titles
+        except Exception as e:
+            raise ValueError(f"Error in processing PDF elements: {e}")
             
     
     def save_pdf_text_local(self, file_path, text):
-        with open(file_path, "w") as file:
-            file.write(text)
-    
+        try:
+            with open(file_path, "w") as file:
+                file.write(text)
+        except Exception as e:
+            raise ValueError(f"Error in saving PDF text: {e}")
 
     def get_figure_name(self, pdf_element: list):
-        tmp_caption = ""
-        for tmp_element in pdf_element:
-            if tmp_element["type"] == "FigureCaption":
-                tmp_caption += tmp_element["text"] + "\n"
+        try:
+            tmp_caption = ""
+            for tmp_element in pdf_element:
+                if tmp_element["type"] == "FigureCaption":
+                    tmp_caption += tmp_element["text"] + "\n"
+                    
+            pattern = r"Figure (\d+):"
+            
+            if tmp_caption:
+                image_number = get_data_from_pattern(pattern, tmp_caption)
+                if image_number:
+                    return f"Figure-{image_number}" 
                 
-        pattern = r"Figure (\d+):"
-        
-        if tmp_caption:
-            image_number = get_data_from_pattern(pattern, tmp_caption)
-            if image_number:
-                return f"Figure-{image_number}" 
-            
-        return None 
+            return None 
+        except Exception as e:
+            raise ValueError(f"Error in getting figure name: {e}")
 
             
-    
     def html_to_text(self, html_text: str):
-        table_html = "<table>" + html_text + "</table>"
-        soup = BeautifulSoup(table_html, "html.parser")
-        rows = soup.find_all("tr")
-        return "\n".join(" | ".join(cell.get_text(strip=True) for cell in row.find_all("td")) for row in rows)
-
+        try:
+            table_html = "<table>" + html_text + "</table>"
+            soup = BeautifulSoup(table_html, "html.parser")
+            rows = soup.find_all("tr")
+            return "\n".join(" | ".join(cell.get_text(strip=True) for cell in row.find_all("td")) for row in rows)
+        except Exception as e:
+            raise ValueError(f"Error in converting HTML to text: {e}")

@@ -12,8 +12,6 @@ RUN apt-get update && \
     libglib2.0-0 \
     poppler-utils \
     wget && \
-    mkdir -p /usr/share/tesseract-ocr/4.00/ && \
-    ln -s /usr/share/tesseract-ocr/5/tessdata /usr/share/tesseract-ocr/4.00/tessdata && \
     apt-get clean
 
 RUN apt-get update

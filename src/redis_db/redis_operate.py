@@ -16,7 +16,10 @@ redis_client = redis.Redis(
 class RedisDB_Manager:
     @staticmethod
     def save_to_redis(key, data):
-        redis_client.set(key, json.dumps(data))
+        try:
+            redis_client.set(key, json.dumps(data))
+        except Exception as e:
+            raise Exception(f"Error in save_to_redis: {str(e)}")
         
     @staticmethod
     def load_from_redis(key):
@@ -30,7 +33,10 @@ class RedisDB_Manager:
         
     @staticmethod
     def delete_from_redis(key):
-        redis_client.delete(key)
+        try:
+            redis_client.delete(key)
+        except Exception as e:
+            raise Exception(f"Error in delete_from_redis: {str(e)}")
     
     @staticmethod
     def initialize_user_data(redis_key, userId):

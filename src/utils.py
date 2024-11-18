@@ -11,21 +11,31 @@ def get_data_from_pattern(pattern: str, text: str):
     
 class DictToObject:
     def __init__(self, dictionary):
+        if not isinstance(dictionary, dict):
+            raise TypeError("Input must be a dictionary")
+
         for key, value in dictionary.items():
-            if isinstance(value, dict):
-                setattr(self, key, DictToObject(value))
-            else:
-                setattr(self, key, value)
+            try:
+                if isinstance(value, dict):
+                    setattr(self, key, DictToObject(value))
+                else:
+                    setattr(self, key, value)
+            except Exception as e:
+                raise RuntimeError(f"Error setting attribute '{key}' with value '{value}': {e}")
+
                 
 class ObjectToDict:
     @staticmethod
     def convert(obj):
-        if not hasattr(obj, "__dict__"):
-            return obj
-        result = {}
-        for key, value in obj.__dict__.items():
-            if isinstance(value, DictToObject):  # Recursive call for nested objects
-                result[key] = ObjectToDict.convert(value)
-            else:
-                result[key] = value
-        return result
+        try:
+            if not hasattr(obj, "__dict__"):
+                return obj
+            result = {}
+            for key, value in obj.__dict__.items():
+                if isinstance(value, DictToObject):  # Recursive call for nested objects
+                    result[key] = ObjectToDict.convert(value)
+                else:
+                    result[key] = value
+            return result
+        except Exception as e:
+            raise RuntimeError(f"Error converting object to dictionary: {e}")
