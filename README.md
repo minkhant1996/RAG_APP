@@ -47,7 +47,8 @@ cd RAG_APP
 ```
 
 #### **3. Configure the Application**
-Create an `.env` file for application configuration. Use `.env.example` as a reference to populate the required fields and values.
+- Create an `.env` file for application configuration. Use `.env.example` as a reference to populate the required fields and values.
+- Config setting is in the folder `src/config/yml_files/main_config.yml`. You can change some setting freely. However, there are some setting that you will also have to implement the code if you changed.
 
 #### **4. Run the docker**
 - Modify the volume in docker-compose.dev.yml as your local path
