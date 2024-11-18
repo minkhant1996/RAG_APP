@@ -1,16 +1,16 @@
 # RAG_APP
 
-## **Table of Contents**
+## Table of Contents
+- [To Do Next](#to-do-next)
+- [How to Run This App](#how-to-run-this-app)
+    - [Prerequisites](#prerequisites)
+    - [Cloning and Setup](#cloning-and-setup)
+- [User Guide](#user-guide)
+    - [How This App Works](#how-this-app-works)
+    - [How to Get Chat History](#how-to-get-chat-history)
+    - [How to Clear Chat History](#how-to-clear-chat-history)
+    - [How to Use LangChain QA Eval](#how-to-use-langchain-qa-eval)
 
-1. **To Do Next**  
-2. **How to run this app**  
-   - Prerequisites  
-   - Cloning and Setup  
-3. **User Guide**  
-   - How This App Works  
-   - How to Get Chat History  
-   - How to Clear Chat History  
-   - How to Use LangChain QA Eval  
 
 ## To Do Next
 - Improve evaluation on doc extraction
