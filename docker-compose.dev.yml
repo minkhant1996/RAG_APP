@@ -17,6 +17,8 @@ services:
       - "8000:8000" 
     env_file:
       - .env
+    volumes:
+      - /home/minkhant/Documents/rag_volume:/rag_volume
 
   redis:
     image: redis:latest

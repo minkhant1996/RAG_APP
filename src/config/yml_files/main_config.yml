@@ -1,13 +1,14 @@
 ENVIRONMENT: null
 
 API:
-  prefix: "/api/v1"
-  upload_pdf: "/upload_pdf"
-  chatbot: "/chatbot"
+  prefix: /api/v1
+  upload_pdf: /upload_pdf
+  chatbot: /chatbot
+  clear_conversation: /clear_conversation
+  retrieve_conversation: /retrieve_conversation
+  run_langchain_eval_qa: /run_langchain_eval_qa
 
 TIMEZONE: Asia/Bangkok
-
-EMBEDDING:
     
 PROMPT:
   trigger_words:
@@ -21,6 +22,7 @@ PROMPT:
     find_titles: prompts/find_titles.txt
     intent_detection: prompts/intent_detection.txt
     chatbot_response: prompts/chatbot_response.txt
+    evaluate_doc_extraction: prompts/evaluate_doc_extraction.txt
 
 REDIS:
   key:
@@ -28,15 +30,23 @@ REDIS:
     sufix: _RAG
 
 User_Data_Local:
-  user_data_path: tmp
+  user_data_path: /rag_volume/tmp
 
 RAG:
+  vectors_store_type: faiss
+  save_original_pdf: True
+  save_split_text: False     # useful to check later for performance analysis or debugging
   text_split_methods:        # add more to the list if required to split the text in different ways
-    - semantic_chunker     # if only one method is required, then replace the method here
+    - semantic_chunker     # if only one method is required, then replace the method here, e.g. - semantic_chunker, - recursive_character 
   retrieve:
     text_split_methods:
       - semantic_chunker
-    retrieve_type: similarity  # "similarity", "mmr", "similarity_score_threshold"
+    retrieve_types: 
+      - similarity  # "similarity", "mmr", "similarity_score_threshold" 
+
+  embedding:
+    embed_method: openai
+    embed_model_name: text-embedding-3-small
 
 CHAT_BOT:
   chat_history_length: 5

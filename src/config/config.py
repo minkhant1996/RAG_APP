@@ -5,8 +5,9 @@ import yaml
 from utils import DictToObject
 import pytz
 from datetime import datetime
+os.environ["TESSDATA_PREFIX"] = os.getenv("TESSDATA_PREFIX")
+
 import nltk
-print(nltk.data.path)  # Check current paths
 nltk.download('punkt')
 
 # os.environ["TESSDATA_PREFIX"] = "/usr/share/tesseract-ocr/4.00/"

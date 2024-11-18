@@ -10,8 +10,13 @@ langchain_openai
 unstructured
 unstructured-inference
 unstructured_pytesseract
+unstructured[all] 
 python-dotenv
 faiss-cpu
 redis
 pi_heif
+fastapi
+uvicorn
+onnxruntime 
+onnx
 

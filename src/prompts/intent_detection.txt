@@ -18,8 +18,18 @@ Respond with only `True` or `False`. Do not add any additional information.
 
 <input_prompt>
 Content Type: ###CONTENT_TYPE###  
-Docs: ###DOCS###  
+
+Chat History:
+<<CHAT_HISTORY START>>
+###CHAT_HISTORY###
+<<CHAT_HISTORY END>>
+
+Docs:
+<< DOCS START >>
+###DOCS###
+<< DOCS END >>
+
 User Query: ###USER_QUERY###  
 
-Check if the query is related to any document and provide the detected intent. Your response must only be either `True` or `False`.  
+Check if the query is asking the information that could relate to any document. Your response must only be either `True` or `False`.  
 <input_prompt>

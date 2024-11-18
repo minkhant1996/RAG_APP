@@ -86,4 +86,16 @@ class RedisDB_Manager:
         except Exception as e:
             raise Exception(f"Error in add_chat_history: {str(e)}")
         
-   
+    @staticmethod
+    def clear_chat_history(redis_key, user_data):
+        try:
+            user_data["chat_history"] = []
+            RedisDB_Manager.save_to_redis(redis_key, user_data)
+            return user_data
+        except Exception as e:
+            raise Exception(f"Error in clear_chat_history: {str(e)}")
+        
+        
+
+        
+        

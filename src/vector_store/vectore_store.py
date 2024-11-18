@@ -13,24 +13,26 @@ class VectorStore:
     def create_vector_store(documents, embedding, ids, vectors_store_type, vector_store_local_path):
         os.makedirs(os.path.dirname(vector_store_local_path), exist_ok=True)
         if vectors_store_type == "faiss":
-            if os.path.exists(vector_store_local_path):
-                vector_store = VectorStore.load_vector_store_local(embedding, vector_store_local_path, vectors_store_type)
-                # vector_store = FAISS.add_documents(documents, ids)
-                pass
-            else:
-                vector_store = FAISS.from_documents(documents, embedding, ids=ids)
+            # if os.path.exists(f"{vector_store_local_path}/index.faiss"):
+            #     vector_store = VectorStore.load_vector_store_local(embedding, vector_store_local_path, vectors_store_type)                
+            # else:
+            vector_store = FAISS.from_documents(documents, embedding, ids=ids)
                 
             VectorStore.save_vector_store_local(vector_store, vector_store_local_path, vectors_store_type)
     
     @staticmethod
     def load_vector_store_local(embedding, vector_store_local_path, vectors_store_type):
         if vectors_store_type == "faiss":
-            return FAISS.load_local(
-                vector_store_local_path,
-                embedding, 
-                allow_dangerous_deserialization=True
-                )
-    
+            try:
+                retvector_store = FAISS.load_local(
+                            vector_store_local_path,
+                            embedding, 
+                            allow_dangerous_deserialization=True
+                            )
+                return retvector_store
+            except Exception as e:
+                return None
+            
     @staticmethod  
     def save_vector_store_local(vector_store, vector_store_local_path, vectors_store_type):
         if vectors_store_type == "faiss":

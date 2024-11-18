@@ -6,7 +6,9 @@ from image_processing import ImageProcessor
 from typing import Optional, IO
 import gc, os, re
 from utils import get_data_from_pattern
+from config import Config
 
+config = Config()
 
 class PDF_Reader:
     def __init__(
@@ -91,7 +93,7 @@ class PDF_Reader:
                     if self.save_image:
                         ImageProcessor.save_image_local(
                                     image_data= base64_image, 
-                                    save_path = f"tmp/{self.userId}",
+                                    save_path = f"{config.user_config.user_data_path}/{self.userId}",
                                     file_name = figure_name,
                                     extension = "png"
                                 )
@@ -117,7 +119,7 @@ class PDF_Reader:
                 extracted_info += pdf_element["text"] + "\n"  
       
         if self.save_pdf_text:
-            file_path = f"tmp/{self.userId}"
+            file_path = f"{config.user_config.user_data_path}/{self.userId}"
             os.makedirs(file_path, exist_ok=True)
             self.save_pdf_text_local(os.path.join(file_path, f"{self.pdf_filename}.txt"), extracted_info)
         

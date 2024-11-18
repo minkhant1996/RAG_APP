@@ -1,0 +1,18 @@
+{
+    "userId": "u123452",
+    "question": [
+      "What is the primary focus of this research paper?",
+      "What are the key components of a text-to-SQL prompt as discussed in the paper?",
+      "How does normalized prompt construction impact LLM performance in text-to-SQL tasks?",
+      "What role do in-domain demonstration examples play in text-to-SQL tasks?",
+      "What database knowledge is crucial for effectively prompting LLMs?"
+
+    ],
+    "ref_answer": [
+      "The paper focuses on investigating and comparing different strategies for constructing prompts for large language models (LLMs) in text-to-SQL tasks across zero-shot, single-domain, and cross-domain settings.",
+      "The key components include task instructions, the test database, the test natural language query (NLQ), and optional demonstration examples.",
+      "Normalized prompts reduce token counts and improve execution accuracy in most cases for both Codex and ChatGPT.",
+      "In-domain demonstrations mitigate LLM sensitivity to different representations of database knowledge and enhance performance, particularly in single-domain settings.",
+      "Table relationships and table content are crucial, with specific emphasis on how they are represented in prompts."
+    ]
+  }

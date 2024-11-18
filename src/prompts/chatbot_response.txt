@@ -13,8 +13,16 @@ Your response must be clear, concise, friendly, and helpful.
 <system_prompt>
 
 <input_prompt>
-Chat History: ###CHAT_HISTORY###
-Docs: ###DOCS###
+Chat History: 
+<<CHAT_HISTORY START>>
+###CHAT_HISTORY###
+<<CHAT_HISTORY END>>
+
+Docs: 
+<< DOCS START >>
+###DOCS###
+<< DOCS END >>
+
 User Query: ###USER_QUERY###
 
 Your response must relate to the user query and chat history. 

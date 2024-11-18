@@ -5,17 +5,13 @@ from redis_db import RedisDB_Manager
 from data_loader import PDF_Reader
 from knowledge_manager import KnowledgeManager
 from config import Config
-from api_models.chat_service_api import chatbot_api
+from api_models.chat_service_api import chatbot_api, langchain_eval_qa_api
 from ai_agents import AI_Agents
 
 config = Config()
 
 app = FastAPI()
 router = APIRouter()
-
-# Directory to save uploaded files
-UPLOAD_DIR = "uploaded_pdfs"
-os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
 @router.post(config.api_config.upload_pdf)
@@ -40,7 +36,8 @@ async def upload_pdf(
         reader = PDF_Reader(
             userId=userId,
             pdf_filename=file.filename,
-            pdf_path="test_pdf/pdf1.pdf",
+            # pdf_path="test_pdf/pdf1.pdf",
+            pdf_file = file.file,
             save_image=True,    # To check the image extraction; Later use to return the image
             save_pdf_text=True, # To check the text extraction
             summarize_image=True
@@ -49,25 +46,32 @@ async def upload_pdf(
         extracted_info, main_title, list_titles = reader.process_pdf()
         
         pdf_titles_stored = [pdf["pdf_title"] for pdf in user_data["pdf"]]
-        if main_title not in pdf_titles_stored:
-            user_data = RedisDB_Manager.add_pdf_info(redis_key, user_data, file.filename, main_title, list_titles, [])
-            for text_split_method in config.rag_config.text_split_methods:
-                Knowledge_Manager = KnowledgeManager(
-                    userId=userId,
-                    pdf_name=file.filename,
-                    embed_method="openai",
-                    embed_model_name="text-embedding-3-large",
-                    text_split_method=text_split_method,
-                    vectors_store_type="faiss"
-                )
-            
-            Knowledge_Manager.create_db(extracted_info)
-            
-        # Save the uploaded PDF
-        # file_path = os.path.join(UPLOAD_DIR, file.filename)
+        # if main_title not in pdf_titles_stored: # Check if the PDF is already uploaded - will implement this later
+        user_data = RedisDB_Manager.add_pdf_info(redis_key, user_data, file.filename, main_title, list_titles, [])
+        for text_split_method in config.rag_config.text_split_methods:
+            Knowledge_Manager = KnowledgeManager(
+                userId=userId,
+                pdf_name=file.filename,
+                embed_method=config.rag_config.embedding.embed_method,
+                embed_model_name=config.rag_config.embedding.embed_model_name,
+                text_split_method=text_split_method,
+                vectors_store_type=config.rag_config.vectors_store_type
+            )
         
-        # with open(file_path, "wb") as f:
-        #     f.write(file.file.read())
+        Knowledge_Manager.create_db(extracted_info)
+            
+        
+        if config.rag_config.save_original_pdf:
+            file_path = os.path.join(
+                config.user_config.user_data_path,
+                userId,
+                "pdf",
+                file.filename
+            )
+            os.makedirs(os.path.dirname(file_path), exist_ok=True)
+            with open(file_path, "wb") as f:
+                f.write(file.file.read())
+
         
         return JSONResponse(content={"message": "File uploaded successfully"})
     except Exception as e:
@@ -95,5 +99,50 @@ async def chatbot_endpoint(request: chatbot_api):
 
     return JSONResponse(content={"response": response_text})
 
+@router.get(config.api_config.clear_conversation)
+async def clear_conversation(userId: str):
+    redis_key = f"{config.redis_config.key.prefix}{userId}{config.redis_config.key.sufix}"
+    user_data = RedisDB_Manager.load_from_redis(redis_key)
+    if not user_data:
+        user_data = RedisDB_Manager.initialize_user_data(redis_key, userId)
+    
+    
+    user_data = RedisDB_Manager.clear_chat_history(redis_key, user_data)
+    return JSONResponse(content={"message": "Conversation cleared successfully."})
+
+@router.get(config.api_config.retrieve_conversation)
+async def retrieve_conversation(userId: str):
+    redis_key = f"{config.redis_config.key.prefix}{userId}{config.redis_config.key.sufix}"
+    user_data = RedisDB_Manager.load_from_redis(redis_key)
+    if not user_data:
+        user_data = RedisDB_Manager.initialize_user_data(redis_key, userId)
+    
+    chat_history = user_data["chat_history"]
+    return JSONResponse(content={"chat_history": chat_history})
+
+@router.post(config.api_config.run_langchain_eval_qa)
+async def run_langchain_eval_qa(request: langchain_eval_qa_api):
+    userId = request.userId
+    question_list = request.question
+    answer_list = request.ref_answer
+    assert len(question_list) == len(answer_list), "The number of questions and answers must be the same."
+    
+    redis_key = f"{config.redis_config.key.prefix}{userId}{config.redis_config.key.sufix}"
+    user_data = RedisDB_Manager.load_from_redis(redis_key)
+    if not user_data:
+        user_data = RedisDB_Manager.initialize_user_data(redis_key, userId)
+    
+    if not user_data["pdf"]:
+        raise HTTPException(status_code=400, detail="No PDFs uploaded yet.")
+    
+    response = AI_Agents.langchain_eval_qa(question_list, answer_list, user_data)
+    
+    return JSONResponse(content={"response": response})
+
 # Include the router
 app.include_router(router, prefix=config.api_config.prefix)
+
+
+# if __name__ == "__main__":
+    # import uvicorn
+    # uvicorn.run(app, host="0.0.0.0", port=8000, debug=True)

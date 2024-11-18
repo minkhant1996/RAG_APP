@@ -44,7 +44,13 @@ class KnowledgeManager:
         text_splitter = self.get_text_splitter()
         documents, ids = self.create_documents(text_splitter, text_document)
         
-        vector_store_local_path = f"tmp/{self.userId}/{self.text_split_method}/faiss_index"
+        vector_store_local_path = os.path.join(
+                                        config.user_config.user_data_path, 
+                                        self.userId,
+                                        self.text_split_method,
+                                        "faiss_index"
+                                        )
+        os.makedirs(vector_store_local_path, exist_ok=True)
         VectorStore.create_vector_store(documents, self.embedding, ids, self.vectors_store_type, vector_store_local_path)
     
     
@@ -78,9 +84,18 @@ class KnowledgeManager:
                                             "datetime": str(datetime.now(config.timezone))
                                             }))
                 ids.append(f"{self.pdf_name}_{str(i)}")
-                os.makedirs(f"tmp/{self.userId}/{self.text_split_method}", exist_ok=True)
-                with open(f"tmp/{self.userId}/{self.text_split_method}/{ids[-1]}.txt", "w") as f:
-                    f.write(doc.page_content)
+                
+                
+                if config.rag_config.save_split_text:
+                    file_path = os.path.join(
+                                        config.user_config.user_data_path,
+                                         self.userId, 
+                                         self.text_split_method
+                                         )
+                    os.makedirs(file_path, exist_ok=True)
+                    with open(f"{file_path}/{ids[-1]}.txt", "w") as f:
+                        f.write(doc.page_content)
+                        
             return documents, ids
         except Exception as e:
             raise e
