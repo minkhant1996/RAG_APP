@@ -69,8 +69,12 @@ async def upload_pdf(
                 file.filename
             )
             os.makedirs(os.path.dirname(file_path), exist_ok=True)
+            file.file.seek(0)  # Reset pointer to the beginning of the file
             with open(file_path, "wb") as f:
-                f.write(file.file.read())
+                content = file.file.read()  # Read the file content
+                if not content.startswith(b"%PDF"):
+                    raise Exception(f"Uploaded file {file.filename} is not a valid PDF.")
+                f.write(content)
 
         
         return JSONResponse(content={"message": "File uploaded successfully"})
